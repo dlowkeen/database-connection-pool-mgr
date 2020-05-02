@@ -1,0 +1,23 @@
+{
+  "name": "database-connection-pool-mgr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -P ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dlowkeen/database-connection-pool-mgr.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dlowkeen/database-connection-pool-mgr/issues"
+  },
+  "homepage": "https://github.com/dlowkeen/database-connection-pool-mgr#readme",
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  }
+}

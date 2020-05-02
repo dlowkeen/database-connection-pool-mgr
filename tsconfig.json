@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"declaration": false,
+		"strict": true,
+		"moduleResolution": "node",
+		"noImplicitReturns": true,
+		"noUnusedLocals": true,
+		"preserveConstEnums": true,
+		"removeComments": true,
+		"strictNullChecks": true,
+		"suppressImplicitAnyIndexErrors": true,
+		"target": "ES6",
+		"module": "commonjs",
+		"outDir": "./dist",
+		"sourceMap": true
+	},
+	"exclude": ["dist", "node_modules"]
+}

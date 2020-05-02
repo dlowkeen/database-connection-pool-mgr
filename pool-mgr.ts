@@ -38,9 +38,9 @@ class PoolManager {
     private createGuid() {
         return 'alskdfasdf';
     }
-    private checkAvailableConnex() {
+    // private checkAvailableConnex() {
 
-    }
+    // }
     private connected() {
 
     }
