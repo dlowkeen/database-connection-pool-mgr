@@ -5,7 +5,6 @@ export default class PoolManager {
     private static DEFAULT_CONNECTIONS: number = 5;
     private min: number;
     private active = {};
-    private all = {};
     private available = {};
     private options: PoolManagerConfig;
     private Client: any;
@@ -43,8 +42,7 @@ export default class PoolManager {
             const connection = this.connect();
             newConnections[connection.key] = connection;
         }
-        this.all = Object.assign(this.all, newConnections);
-        this.available = newConnections;
+        this.available = Object.assign(this.available, newConnections);
     }
 
     private claimConnection() {
@@ -54,19 +52,20 @@ export default class PoolManager {
         return this.active[keys[0]];
     }
 
+    private connectionIsAvailable() {
+        return Object.keys(this.available).length > 0;
+    }
+
     private getConnection() {
-        if (!(this.active < Object.keys(this.all).length)) {
+        if (!this.connectionIsAvailable()) {
             this.openBatchConnections(this.min);
         }
         return this.claimConnection();
     }
 
-    private releaseConnection(connectionKey: string) {
-        this.available[connectionKey] = this.active[connectionKey];
-        delete this.active[connectionKey];
-        // minimum is 5
-        // current connections in use = 17
-        // available connections is = 40
+    private releaseConnection(key: string) {
+        this.available[key] = this.active[key];
+        delete this.active[key];
     }
 
     private createGuid() {
@@ -77,5 +76,3 @@ export default class PoolManager {
         return Object.assign(new this.Client(this.options), { key: this.createGuid() });
     }
 }
-
-// initialize the pool manager on app start up
