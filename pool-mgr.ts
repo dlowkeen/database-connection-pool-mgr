@@ -23,10 +23,12 @@ export default class PoolManager {
     /**
      * This is the only public method because we want to encapsulate the pool mgr connecting logic.
      * @param text SQL statement. Didn't go into detail on the different types of queries i could do.
-     * Focusing more on the implementation of the pool manager.
+     * Focusing more on the implementation of the pool manager. Operating under assumption, client
+     * contains a 'query' method.
      */
     public query(text: string) {
-        const client = this.getConnection();
+        const { client, err } = this.getConnection();
+        if (err) { throw err }
         client.query(text, (err: Error, res: any) => {
             if (err) {
                 throw err;
@@ -57,10 +59,18 @@ export default class PoolManager {
     }
 
     private getConnection() {
-        if (!this.connectionIsAvailable()) {
-            this.openBatchConnections(this.min);
+        let client = null;
+        let err = null;
+        try {
+            if (!this.connectionIsAvailable()) {
+                this.openBatchConnections(this.min);
+            }
+            client = this.claimConnection();
+        } catch (err) {
+            err = err;
+        } finally {
+            return { client, err }
         }
-        return this.claimConnection();
     }
 
     private releaseConnection(key: string) {
