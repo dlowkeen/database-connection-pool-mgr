@@ -16,3 +16,11 @@ export interface PoolManagerConfig extends BaseConfig {
     // max?: number,
     idleTimeout?: number,
 }
+
+/**
+ * Just a mock Client interface
+ */
+export interface IClient {
+    constructor(config?: BaseConfig): any;
+    query (text: string, cb: (err: Error, res: any) => any): any;
+}

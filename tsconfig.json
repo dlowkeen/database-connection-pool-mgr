@@ -10,7 +10,7 @@
 		"removeComments": true,
 		"strictNullChecks": true,
 		"suppressImplicitAnyIndexErrors": true,
-		"target": "ES6",
+		"target": "ES2017",
 		"module": "commonjs",
 		"outDir": "./dist",
 		"sourceMap": true

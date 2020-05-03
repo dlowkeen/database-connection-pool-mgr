@@ -1,11 +1,9 @@
-import uuid from 'uuid';
-import { PoolManagerConfig } from './interfaces';
+import { IClient, PoolManagerConfig } from './interfaces';
 
 export default class PoolManager {
     private static DEFAULT_CONNECTIONS: number = 5;
     private min: number;
-    private active = {};
-    private available = {};
+    private connectionQueue: IClient[] = [];
     private options: PoolManagerConfig;
     private Client: any;
 
@@ -13,7 +11,7 @@ export default class PoolManager {
      * @param options PoolManagerConfig
      * @param client the constructor of a postgres or mysql client or something similar.
      */
-    constructor(options: PoolManagerConfig, client: any) {
+    constructor(options: PoolManagerConfig, client: IClient) {
         this.options = options;
         this.Client = client;
         this.min = options.min || PoolManager.DEFAULT_CONNECTIONS;
@@ -29,33 +27,31 @@ export default class PoolManager {
     public query(text: string) {
         const { client, err } = this.getConnection();
         if (err) { throw err }
-        client.query(text, (err: Error, res: any) => {
-            if (err) {
-                throw err;
-            }
-            this.releaseConnection(client.key);
-            return res;
-        });
+        if (client) {
+            client.query(text, (err: Error, res: any) => {
+                if (err) {
+                    throw err;
+                }
+                this.releaseConnection(client);
+                return res;
+            });
+        }
     }
 
     private openBatchConnections(connex: number) {
-        const newConnections = {};
         for (let i = 0; i < connex; i++) {
             const connection = this.connect();
-            newConnections[connection.key] = connection;
+            this.connectionQueue.push(connection);
         }
-        this.available = Object.assign(this.available, newConnections);
     }
 
     private claimConnection() {
-        const keys = Object.keys(this.available);
-        this.active[keys[0]] = this.available[keys[0]];
-        delete this.available[keys[0]];
-        return this.active[keys[0]];
+        const connection = this.connectionQueue.shift();
+        return connection;
     }
 
     private connectionIsAvailable() {
-        return Object.keys(this.available).length > 0;
+        return this.connectionQueue.length > 0;
     }
 
     private getConnection() {
@@ -73,16 +69,11 @@ export default class PoolManager {
         }
     }
 
-    private releaseConnection(key: string) {
-        this.available[key] = this.active[key];
-        delete this.active[key];
-    }
-
-    private createGuid() {
-        return uuid.v4();;
+    private releaseConnection(client: any) {
+        this.connectionQueue.push(client);
     }
 
     private connect() {
-        return Object.assign(new this.Client(this.options), { key: this.createGuid() });
+        return new this.Client(this.options);
     }
 }
