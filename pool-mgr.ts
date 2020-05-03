@@ -24,7 +24,7 @@ export default class PoolManager {
      * Focusing more on the implementation of the pool manager. Operating under assumption, client
      * contains a 'query' method.
      */
-    public query(text: string) {
+    public query(text: string): any {
         const { client, err } = this.getConnection();
         if (err) { throw err }
         if (client) {
@@ -40,14 +40,12 @@ export default class PoolManager {
 
     private openBatchConnections(connex: number) {
         for (let i = 0; i < connex; i++) {
-            const connection = this.connect();
-            this.connectionQueue.push(connection);
+            this.connectionQueue.push(this.connect());
         }
     }
 
     private claimConnection() {
-        const connection = this.connectionQueue.shift();
-        return connection;
+        return this.connectionQueue.shift();
     }
 
     private connectionIsAvailable() {
